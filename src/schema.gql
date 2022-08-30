@@ -1,0 +1,464 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type ProductBrand {
+  id: Float!
+  name: String!
+  path: String!
+}
+
+type ProductCategory {
+  id: Float!
+  name: String!
+  description: String!
+  path: String!
+  slug: String!
+  parent: ProductCategory
+  children: [ProductCategory!]
+  updatedAt: DateTime!
+  createdAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type ProductReview {
+  id: Float!
+  title: String!
+  content: String!
+  wouldRecommend: Boolean!
+  rating: Float!
+  nickname: String!
+  isPublished: Boolean!
+  productId: Float!
+  publishedAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type ProductColor {
+  id: Float!
+  value: String!
+}
+
+type ProductSize {
+  id: Float!
+  value: String!
+}
+
+type ProductAttribute {
+  sku: String!
+  quantity: Float!
+  size: ProductSize!
+  color: ProductColor!
+}
+
+type ProductImage {
+  id: Float!
+  imageUrl: String!
+}
+
+type Product {
+  id: Float!
+  name: String!
+  description: String!
+  originalPrice: Float!
+  currentPrice: Float!
+  isDiscontinued: Boolean!
+  brandId: Float!
+  brand: ProductBrand!
+  images: [ProductImage!]!
+  attributes: [ProductAttribute!]!
+  categoryId: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  currentPriceLabel: String!
+}
+
+type CustomerOrderItem {
+  orderId: Float!
+  productId: Float!
+  sku: String!
+  quantity: Float!
+  product: Product!
+}
+
+type CustomerOrderStatus {
+  id: Float!
+  status: String!
+}
+
+type CustomerOrder {
+  id: Float!
+  orderNumber: String!
+  deliveryAddress: String!
+  city: String!
+  postalCode: String!
+  totalAmount: Float!
+  shippingCost: Float!
+  grandTotal: Float!
+  purchaseCurrency: String!
+  paymentType: String!
+  userId: String!
+  stripeSessionId: String
+  orderStatusId: Float!
+  orderStatus: CustomerOrderStatus!
+  orderItems: [CustomerOrderItem!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type User {
+  id: String!
+  firstName: String!
+  lastName: String!
+  mobilePhoneNumber: String
+  email: String!
+  isEmailConfirmed: Boolean!
+  isRegisteredWithGoogle: Boolean!
+  isAdmin: Boolean!
+  permissions: [Permission!]!
+  address: UserAddress
+  deletedAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""The permissions of the user"""
+enum Permission {
+  CREATE_PRODUCT
+  UPDATE_PRODUCT
+  DELETE_PRODUCT
+  UPDATE_PRODUCT_REVIEW
+  DELETE_PRODUCT_REVIEW
+  READ_PRODUCT_REVIEW
+  READ_USER
+  UPDATE_USER
+  DELETE_USER
+  UPDATE_CUSTOMER_ORDER
+  READ_CUSTOMER_ORDER
+}
+
+type UserAddress {
+  id: Float!
+  city: String!
+  street: String!
+  postalCode: String!
+}
+
+type PaginatedUsersOutput {
+  items: [User!]!
+  totalCount: Float!
+  hasMore: Boolean!
+}
+
+type UserWithTokensDto {
+  user: User!
+  accessToken: String!
+  refreshToken: String!
+}
+
+type QueryProductsOutput {
+  items: [Product!]!
+  totalCount: Float!
+  hasMore: Boolean!
+}
+
+type FindOneCustomerOrderOutput {
+  order: CustomerOrder!
+  user: User
+  isEditable: Boolean!
+}
+
+type PaginatedCustomerOrdersOutput {
+  items: [CustomerOrder!]!
+  totalCount: Float!
+  hasMore: Boolean!
+}
+
+type BasicCategory {
+  id: Float!
+  name: String!
+}
+
+type PublishedProductReviewsOutput {
+  items: [ProductReview!]!
+  totalCount: Float!
+  hasMore: Boolean!
+  averageRating: Float!
+}
+
+type QueryAllProductReviewsOutput {
+  items: [ProductReview!]!
+  totalCount: Float!
+  hasMore: Boolean!
+}
+
+type CreateOrGetOrderWithStripeOutput {
+  wasCreated: Boolean!
+  order: CustomerOrder!
+  user: User
+}
+
+type Query {
+  me: User!
+  users(input: FindAllUsersInput!): PaginatedUsersOutput!
+  user(id: String!): User!
+  hasPassword: Boolean!
+  categories: [ProductCategory!]!
+  basicCategories: [BasicCategory!]!
+  getOneCategory(path: String!): ProductCategory!
+  searchProducts(input: SearchProductsInput!): [Product!]!
+  products(input: FindProductsInput!): QueryProductsOutput!
+  product(id: Float!): Product!
+  productsBySku(input: FindProductsBySkusInput!): QueryProductsOutput!
+  myOrders(input: FindMyCustomerOrdersInput!): PaginatedCustomerOrdersOutput!
+  customerOrders(input: FindAllCustomerOrdersInput!): PaginatedCustomerOrdersOutput!
+  oneCustomerOrder(id: Float!): FindOneCustomerOrderOutput!
+  productBrands(input: FindProductBrandsInput!): [ProductBrand!]!
+  publishedProductReviews(input: FindPublishedProductReviewsInput!): PublishedProductReviewsOutput!
+  allProductReviews(input: FindAllProductReviewsInput!): QueryAllProductReviewsOutput!
+  oneProductReview(id: Float!): ProductReview!
+}
+
+input FindAllUsersInput {
+  offset: Float!
+  limit: Float!
+  q: String
+  sortBy: USER_SORT_BY
+  sortDirection: SORT_DIRECTION
+}
+
+enum USER_SORT_BY {
+  ID
+  IS_ADMIN
+}
+
+enum SORT_DIRECTION {
+  DESC
+  ASC
+}
+
+input SearchProductsInput {
+  resultLimit: Float!
+  searchTerm: String!
+}
+
+input FindProductsInput {
+  offset: Float!
+  limit: Float!
+  categoryPath: String!
+  sortBy: PRODUCT_SORT_BY
+  sortDirection: SORT_DIRECTION
+}
+
+enum PRODUCT_SORT_BY {
+  ID
+  NAME
+  CURRENT_PRICE
+}
+
+input FindProductsBySkusInput {
+  skus: [String!]!
+  offset: Float!
+  limit: Float!
+}
+
+input FindMyCustomerOrdersInput {
+  offset: Float!
+  limit: Float!
+  sortBy: CUSTOMER_ORDER_SORT_BY
+  sortDirection: SORT_DIRECTION
+}
+
+enum CUSTOMER_ORDER_SORT_BY {
+  ID
+  CREATED_AT
+  GRAND_TOTAL
+  STATUS
+}
+
+input FindAllCustomerOrdersInput {
+  offset: Float!
+  limit: Float!
+  q: String
+  filters: CustomerOrderFilter
+  sortBy: CUSTOMER_ORDER_SORT_BY
+  sortDirection: SORT_DIRECTION
+}
+
+input CustomerOrderFilter {
+  orderStatusFilter: [CUSTOMER_ORDER_STATUS!]
+}
+
+enum CUSTOMER_ORDER_STATUS {
+  PENDING
+  PROCESSING
+  SHIPPED
+  COMPLETED
+  CANCELLED
+  REFUNDED
+  FAILED
+  ON_HOLD
+}
+
+input FindProductBrandsInput {
+  sortBy: BRAND_SORT_BY
+  sortDirection: SORT_DIRECTION
+}
+
+enum BRAND_SORT_BY {
+  ID
+  NAME
+}
+
+input FindPublishedProductReviewsInput {
+  productId: Float!
+  offset: Float!
+  limit: Float!
+  sortBy: PRODUCT_REVIEW_SORT_BY
+  sortDirection: SORT_DIRECTION
+}
+
+enum PRODUCT_REVIEW_SORT_BY {
+  ID
+  CREATED_AT
+}
+
+input FindAllProductReviewsInput {
+  offset: Float!
+  limit: Float!
+  q: String
+  filter: ProductReviewsFilterInput
+  sortBy: PRODUCT_REVIEW_SORT_BY
+  sortDirection: SORT_DIRECTION
+}
+
+input ProductReviewsFilterInput {
+  type: PRODUCT_REVIEW_FILTER!
+  applied: Boolean!
+}
+
+enum PRODUCT_REVIEW_FILTER {
+  IS_PUBLISHED
+}
+
+type Mutation {
+  updateUser(input: UpdateUserInput!): User!
+  deleteUser(input: DeleteUserInput!): Boolean!
+  updateUserAddress(input: UpdateUserAddressInput!): User!
+  updatePassword(input: UpdateUserPasswordInput!): Boolean!
+  createProduct(input: CreateProductInput!): Product!
+  updateProduct(input: UpdateProductInput!): Product!
+  deleteProduct(id: Float!): Boolean!
+  updateCustomerOrder(input: UpdateCustomerOrderInput!): Boolean!
+  createProductReview(input: CreateProductReviewInput!): ProductReview!
+  deleteProductReview(id: Float!): Boolean!
+  updateProductReview(input: UpdateProductReviewInput!): ProductReview!
+  createOrGetCustomerOrderWithStripe(stripeSessionId: String!): CreateOrGetOrderWithStripeOutput!
+  registerUser(input: RegisterUserDto!): UserWithTokensDto!
+  login(input: LoginUserDto!): UserWithTokensDto!
+  logout: Boolean!
+  authenticateWithGoogle(googleAuthToken: String!): UserWithTokensDto!
+}
+
+input UpdateUserInput {
+  userId: String!
+  email: String!
+  firstName: String!
+  lastName: String!
+  mobilePhoneNumber: String!
+  city: String!
+  street: String!
+  postalCode: String!
+}
+
+input DeleteUserInput {
+  userId: String!
+  password: String!
+}
+
+input UpdateUserAddressInput {
+  city: String!
+  street: String!
+  postalCode: String!
+}
+
+input UpdateUserPasswordInput {
+  oldPassword: String
+  newPassword: String!
+}
+
+input CreateProductInput {
+  name: String!
+  description: String!
+  price: Float!
+  imageUrls: [String!]!
+  categoryId: Float!
+  brandId: Float!
+  attributes: [CreateProductAttributeInput!]!
+}
+
+input CreateProductAttributeInput {
+  size: AttributeValueType!
+  color: AttributeValueType!
+  quantity: Float!
+}
+
+input AttributeValueType {
+  value: String!
+}
+
+input UpdateProductInput {
+  productId: Float!
+  name: String!
+  description: String!
+  currentPrice: Float!
+  isDiscontinued: Boolean!
+  imageUrls: [String!]!
+  attributes: [CreateProductAttributeInput!]!
+}
+
+input UpdateCustomerOrderInput {
+  orderId: Float!
+  city: String!
+  deliveryAddress: String!
+  postalCode: String!
+  orderStatus: CUSTOMER_ORDER_STATUS!
+}
+
+input CreateProductReviewInput {
+  title: String!
+  content: String!
+  wouldRecommend: Boolean!
+  rating: Float!
+  nickname: String!
+  email: String!
+  productId: Float!
+}
+
+input UpdateProductReviewInput {
+  title: String!
+  content: String!
+  isPublished: Boolean!
+  reviewId: Float!
+}
+
+input RegisterUserDto {
+  email: String!
+  firstName: String!
+  lastName: String!
+  mobilePhoneNumber: String!
+  password: String!
+  city: String!
+  street: String!
+  postalCode: String!
+}
+
+input LoginUserDto {
+  email: String!
+  password: String!
+}
